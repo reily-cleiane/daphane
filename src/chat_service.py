@@ -28,7 +28,8 @@ class ChatService:
             config=self.config,
         )
         self.chain = None
-        self.tabela_requisicao = wandb.Table(columns=["pergunta", "fragmentos_recuperados", "resposta_modelo"])
+        self.tabela_log_requisicao = wandb.Table(columns=["pergunta", "fragmentos_recuperados", "resposta_modelo",
+        "total_duration", "load_duration","prompt_eval_duration", "prompt_eval_count", "eval_count", "eval_duration"])
 
         if os.environ["OPENAI_API_KEY"]:
             openai_key = os.environ["OPENAI_API_KEY"]
@@ -63,15 +64,10 @@ class ChatService:
         #     print(f"\n\nInício do contexto: =======\n {doc.page_content}\nFim do contexto ======\n\n") 
 
         contexto = self.recuperar_conteudo_arquivos(retrieved_docs)
-
-        resposta = self.ollama_service.responder(pergunta, contexto, historico)
-        # print(f"\n\n resposta ============================== \n\n{resposta}")
-
-        self.tabela_requisicao.add_data(pergunta, (doc.metadata["documents"] for doc in retrieved_docs) , resposta)
-        wandb.log({"Tabela_Requisicao": self.tabela_requisicao})
-        historico.append((pergunta, resposta))
-        print("\n\n ============ resposta ============ \n\n", resposta)
+        resposta_com_metricas, resposta = self.ollama_service.responder(pergunta, contexto, historico)
+        self.log_requisicao(pergunta, retrieved_docs, resposta, resposta_com_metricas)
         
+        # historico.append((pergunta, resposta))        
         msg = {
             "tipo": "dados",
             "descricao": "Mensagem do LLM",
@@ -79,9 +75,24 @@ class ChatService:
                 "resposta": resposta
             }
         }
+
         return json.dumps(msg)
+    
+    def log_requisicao(self, pergunta, retrieved_docs, resposta, resposta_com_metricas):
+        fragmentos = ""
+        for indice, doc in enumerate(retrieved_docs):
+            fragmentos += f"Framento {indice}: {doc.page_content}"
 
-
+        self.tabela_log_requisicao.add_data(pergunta, fragmentos, resposta, 
+            resposta_com_metricas["total_duration"], 
+            resposta_com_metricas["load_duration"],
+            resposta_com_metricas["prompt_eval_duration"], 
+            resposta_com_metricas["prompt_eval_count"], 
+            resposta_com_metricas["eval_count"], 
+            resposta_com_metricas["eval_duration"])
+        
+        self.wandb_run.log({"Tabela_Requisicao": self.tabela_log_requisicao})
+        
         # # Obtenha a resposta, passando os documentos e o contexto
         # response = get_answer(
         #     chain=self.chain,

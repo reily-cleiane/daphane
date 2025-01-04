@@ -13,9 +13,9 @@ default_config = SimpleNamespace(
     chat_prompt_artifact="cleiane-projetos/daphane/prompt_mensagem_sistema:latest",
     # chat_temperature=1.6,
     options = {
-        "temperature": 0.7,
-        "top_k": 60,
-        "top_p": 0.9
+        "temperature": 0.3,
+        "top_k": 40,
+        "top_p": 0.6
     },
     max_fallback_retries=1,
     modelo_embed="text-embedding-ada-002",

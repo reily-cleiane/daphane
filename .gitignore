@@ -5,6 +5,7 @@ __pycache__/
 
 # Ignorar a pasta "artifacts" e tudo dentro dela, na raiz do repositório
 /artifacts/
+/ambiente-daphane/
 
 # Ignorar a pasta "wandb" e tudo dentro dela, na raiz do repositório
 /wandb/

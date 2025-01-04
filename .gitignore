@@ -3,6 +3,18 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Ignorar a pasta "artifacts" e tudo dentro dela, na raiz do repositório
+/artifacts/
+
+# Ignorar a pasta "wandb" e tudo dentro dela, na raiz do repositório
+/wandb/
+
+# Ignorar pastas específicas dentro da "src"
+src/__pycache__/
+src/artifacts/
+src/vector_store/
+src/wandb/
+
 # C extensions
 *.so
 

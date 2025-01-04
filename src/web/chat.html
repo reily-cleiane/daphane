@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="icon" type="image/png" href="/web/img/favicon/favicon-48x48.png" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/web/img/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="/web/img/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/web/img/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="/web/img/favicon/site.webmanifest" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Assistente de Busca</title>
+    <style>
+        :root{
+            --azul-claro: #1A73E8;
+            --azul-medio: #145dbd;
+            --azul-escuro: #163C70;
+            --branco-fundo-1: #f6f6f6;
+            --branco-fundo-2: #f8f9fa;
+            --branco-fundo-3: #ccc;
+            --cinza-claro: #e9ecef;
+            --cinza-medio: #9e9c9c;
+            --cinza-escuro: #616161;
+        }
+        body{
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--branco-fundo-1);
+            font-family: Arial, sans-serif;
+        }
+        .cabecalho{
+            width: 100%;
+            background-color: var(--azul-escuro);
+        }
+        .titulo{
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .logo{
+            padding-right: 15px;
+            align-self: center;
+        }
+        .logo img{
+            height: 40px;
+        }
+        .rotulo-titulo h1{
+            padding-left: 15px;
+            align-self: center;
+            border-left: 1px solid white;
+            font-size: 28px;
+        }
+        .container-conteudo{
+            width: 50%;
+            min-width: 414px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .nome-bot{
+            background: white;
+            display: flex;
+            align-items: center;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            padding: 5px;
+            box-shadow: 0px 4px 4px -4px;
+            z-index: 1000;
+        }
+        .img-assistente{
+            margin: 10px;
+            height: 40px;
+            border-radius: 50%;
+            border-style: solid;
+            border-width: 1px;
+            border-color: gray;
+        }
+        .rotulo-assistente{
+            margin-left: 10px;
+            font-size: 22px;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            color: var(--azul-escuro)
+        }
+        .wrapper-container-exibicao-mensagens{
+            padding: 0px 10px;
+        }
+        .container-exibicao-mensagens{
+            flex: 1;
+            margin-bottom: 20px;
+            height: calc(100vh - 305px);
+            padding: 10px;
+            overflow: auto;
+            background-color: var(--cinza-claro);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .text-box{
+            width: 75%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background-color: var(--branco-fundo-2);
+            word-wrap: break-word;
+            box-sizing: border-box;
+            font-size: small;
+            box-shadow: 1px 1px 2px rgb(0, 0, 0, 0.1);
+            justify-content:space-between;
+        }
+        .align-left{
+            align-self: flex-start;
+        }
+        .align-right{
+            align-self: flex-end;
+        }
+        .mensagem-enviada{
+            align-self: flex-end;
+            background-color: var(--azul-escuro);
+            color: white;
+        }
+        .mensagem-recebida{
+            align-self: flex-start;
+            background-color: white;
+        }
+        .mensagem-erro{
+            align-self: flex-start;
+            background-color: #ffdddd;
+            color:#bb3434
+        }
+        .container-envio-mensagens{
+            display: flex;
+            flex-direction: row;
+            justify-content:space-between;
+        }
+        #text-input{
+            width:100%;
+            height: 37px;
+            margin-bottom: 10px;
+            margin-right: 10px;
+            border: 1px solid var(--branco-fundo-3);
+            border-radius: 4px;
+            padding-left: 10px;
+        }
+        #text-input:disabled{
+            background-color: var(--branco-fundo-3);
+        }
+
+        #botao-enviar{
+            width: 80px;
+            height: 41px;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--azul-claro);
+            color: white;
+            cursor: pointer;
+        }
+        #botao-enviar:hover{
+            background-color: var(--azul-medio);
+        }
+        #botao-enviar:disabled:hover{
+            background-color: var(--cinza-medio);
+            color: var(--cinza-escuro);
+        }
+        #botao-enviar:disabled{
+            background-color: #9e9c9c;
+            color: #616161;
+            cursor:default;
+        }
+        @media (max-width: 414px){
+            .titulo{
+                flex-direction: column;
+                align-items: center;
+                margin-top: 10px;
+            }
+            .container-conteudo{
+                width: 100%;
+                min-width: 300px;
+                border: none;
+                box-shadow: none;
+            }
+            .logo{
+                padding-right: 15px;
+                align-self: center;
+            }
+            .logo img{
+                height: 30px;
+            }
+            .rotulo-titulo h1{
+                border-left: 0px;
+                font-size: 20px;
+                padding: 0px;
+                margin: .3em;
+            }
+            .nome-bot{
+                display: flex;
+                align-items: center;
+            }
+        }
+    </style>
+
+    <style>
+        @keyframes dot-blink1{ 0%, 25%{opacity: 0;} 26%, 50%{opacity: 1;} 51%, 75%{opacity: 1;} 76%, 100%{opacity: 1;} }
+        @keyframes dot-blink2{ 0%, 25%{opacity: 0;} 26%, 50%{opacity: 0;} 51%, 75%{opacity: 1;} 76%, 100%{opacity: 1;} }
+        @keyframes dot-blink3{ 0%, 25%{opacity: 0;} 26%, 50%{opacity: 0;} 51%, 75%{opacity: 0;} 76%, 100%{opacity: 1;} }
+        .dots{font-weight: bolder; font-size: large;}
+        .dot1{animation: dot-blink1 2s infinite;}
+        .dot2{animation: dot-blink2 2s infinite;}
+        .dot3{animation: dot-blink3 2s infinite;}
+    </style>
+</head>
+<body>
+    
+    <div class="cabecalho">
+        <div class="titulo">
+            <div class="logo"><img src="/web/img/logo_al.png"></div>
+            <div class="rotulo-titulo"><h1>Assistente de Busca</h1></div>
+        </div>
+    </div>
+
+    <div class="container-conteudo">
+
+
+        <div class="nome-bot">
+            <img class="img-assistente" src="/web/img/Assistente.png">
+            <span class="rotulo-assistente">Daphane</span>
+        </div>
+
+
+        <div class="wrapper-container-exibicao-mensagens">
+            <div class="container-exibicao-mensagens" id="container-exibicao-mensagens">
+                <!-- Divs das mensagens serão adicionadas aqui -->
+                 <div class="text-box mensagem-recebida">
+                    <p>Oi! 😊</p>
+                    <p>Eu sou Daphane, uma assistente de busca de conteúdo da Lei Maria da Penha.</p>
+                    <p>Para facilitar, peço a gentileza de fazer perguntas detalhadas e específicas. Farei o possível para encontrar a resposta.</p>
+                    <p>Tenha em mente que, como estou em fase de testes, é possível que minhas respostas tenham algumas incorreções. 
+                        É importante verificar a Lei diretamente, em caso de dúvida. Basta clicar <a href="http://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11340.htm" target="_blank">aqui.</a></a></p>
+                 </div>
+            </div>
+            <form class="container-envio-mensagens" id="container-envio-mensagens">
+                <input type="text" id="text-input" placeholder="Digite sua pergunta" required="required" oninvalid="setCustomValidity('Escreva uma pergunta')" autofocus>
+                <button onclick="submitText()" id="botao-enviar">Enviar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        var contexto = []
+
+        function formatarResposta(dados_resposta){
+            var textoResposta = 
+                dados_resposta.resposta.split('\n').map((linha) =>{
+                    return `<p>${linha}</p>\n`
+                }).join('\n') + 
+
+                "<hr>\n<p><b>Fontes</b></p>\n<div style='font-size: smaller;font-style: italic;'>\n" + 
+
+                dados_resposta.documentos.map((documento) =>{
+                    return `<p><b>${documento.metadados.titulo}</b><br>${documento.conteudo}</p>`
+                }).join("\n") + 
+                
+                `</div>`;
+            return textoResposta;
+        }
+
+        function rolagemAutomatica(){
+            containerMensagens = document.getElementById("container-exibicao-mensagens");
+            const novaMensagem = containerMensagens.lastElementChild;
+            const posicaoMargemInferiorContainer = containerMensagens.getBoundingClientRect()['y'] + containerMensagens.getBoundingClientRect()["height"];
+            const posicaoMargemInferiorNovaMensagem = novaMensagem.getBoundingClientRect()['y'] + novaMensagem.getBoundingClientRect()["height"];
+
+            // se a margem inferior da mensagem estiver acima da margem inferior do container,
+            // faz a rolagem automática
+            if (posicaoMargemInferiorNovaMensagem <= (posicaoMargemInferiorContainer + 20)){
+                containerMensagens.scrollTop = containerMensagens.scrollHeight;
+            }
+        }
+
+        async function submitText(){
+            // Só executa se houver valor digitado no campo de pergunta
+            if (document.getElementById("text-input").value){
+                document.getElementById("botao-enviar").disabled = true;
+                document.getElementById("text-input").disabled = true;
+                var input = document.getElementById("text-input").value;
+                document.getElementById("text-input").value = "";
+                var divPergunta = document.createElement("div");
+                divPergunta.className = "text-box";
+                divPergunta.textContent = input;
+                divPergunta.classList.add("align-right");
+                divPergunta.classList.add("mensagem-enviada");
+                document.getElementById("container-exibicao-mensagens").appendChild(divPergunta);
+
+                
+                var divResposta = document.createElement("div");
+                divResposta.className = "text-box";
+                divResposta.innerHTML = "<span class='dots'><span class='dot1'>.</span><span class='dot2'>.</span><span class='dot3'>.</span></span>";
+                divResposta.classList.add("align-left");
+                divResposta.classList.add("mensagem-recebida");
+                document.getElementById("container-exibicao-mensagens").appendChild(divResposta);
+                // rola a página até o início da nova mensagem
+                document.getElementById("container-exibicao-mensagens").scrollTop = document.getElementById("container-exibicao-mensagens").scrollHeight;
+
+
+                let habilitarCampos = false;
+        
+                const controller = new AbortController();
+                //AFAZER: Ajustar Timeout. levar em conmsideração demora do Ollama em responder
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
+        
+                try {
+                    const response = await fetch("TAG_INSERCAO_URL_HOST/chat/enviar_pergunta/", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            pergunta: input,
+                            contexto: contexto,
+                        }),
+                        headers: {
+                            "Content-type": "application/json; charset=UTF-8"
+                        },
+                        // Passa o sinal de cancelamento
+                        signal: controller.signal
+                    });
+                    
+                    // Limpa o timeout se a resposta for recebida a tempo
+                    clearTimeout(timeoutId);
+        
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder("utf-8");
+                    let recebeuFlagFimMensagem = false;
+                    let textoAcumulado = "<p>";
+        
+                    while (true) {
+                        rolagemAutomatica();
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        valores_decodificados = decoder.decode(value)
+        
+                        for (let linha of valores_decodificados.split('\n')){
+                            if (linha.trim() === '') continue;
+                            try {
+                                var retorno = JSON.parse(linha.trim());
+                                if (retorno['tipo'] == 'erro') {
+                                    console.error(`${retorno['descricao']}: ${retorno['mensagem']}`);
+                                    divResposta.classList.remove("mensagem-recebida");
+                                    divResposta.classList.add("mensagem-erro");
+                                    divResposta.innerHTML = retorno['mensagem'];
+                                    habilitarCampos = true;
+                                    break;
+                                } else if (retorno['tipo'] == 'info') {
+                                    console.info(`${retorno['descricao']}: ${retorno['mensagem']? retorno['mensagem'] : '<sem conteúdo>'}`);
+                                    continue;
+                                } else if (retorno['tipo'] == 'controle') {
+                                    if (retorno['dados']['tag']=='status') {
+                                        divResposta.innerHTML = `<i>${retorno['dados']['conteudo']}<i> <span class='dots'><span class='dot1'>.</span><span class='dot2'>.</span><span class='dot3'>.</span></span>`;
+                                    }
+                                    continue;
+                                } else if (retorno['tipo'] == 'dados') {
+                                    if (retorno['dados']['tag']=='frag-resposta-llm') {
+                                        textoAcumulado += retorno['dados']['conteudo']
+                                        divResposta.innerHTML = textoAcumulado
+                                    } else if (retorno['dados']['tag']=='resposta-completa-llm') {
+                                        var dados_resposta = retorno['dados']['conteudo'];
+                                        divResposta.innerHTML = formatarResposta(dados_resposta);
+                                        contexto = dados_resposta.resposta_llama.context;
+                                        console.log(dados_resposta);
+                                        habilitarCampos = true;
+                                    }
+                                    continue;
+                                } else {
+                                    console.info(retorno);
+                                    continue;
+                                }
+                            } catch (erro) {
+                                console.error(erro);
+                                console.info(linha);
+                                habilitarCampos = true;
+                                break;
+                            }
+                        }
+                    }
+                } catch (erro) {
+                    // Garante reset do timeout
+                    clearTimeout(timeoutId);
+                    console.error("Erro:", erro);
+        
+                    divResposta.classList.remove("mensagem-recebida");
+                    divResposta.classList.add("mensagem-erro");
+                    // AFAZER: Verificar essas mensagens
+                    if (erro.name === "AbortError") {
+                        divResposta.innerHTML = "O servidor demorou para responder. Tente novamente mais tarde.";
+                    } else {
+                        divResposta.innerHTML = `Ocorreu um erro ao tentar se conectar ao servidor. (Tipo do erro: ${erro.name})`;
+                    }
+                    habilitarCampos=true;
+                }
+                if (habilitarCampos){
+                    document.getElementById("botao-enviar").removeAttribute("disabled");
+                    document.getElementById("text-input").removeAttribute("disabled");
+                    document.getElementById("text-input").focus();
+                }
+            }
+        }
+    </script>
+</body>
+</html>

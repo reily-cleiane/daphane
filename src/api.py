@@ -3,6 +3,11 @@ from fastapi import FastAPI, Query
 from fastapi.responses import FileResponse, HTMLResponse
 from starlette.middleware.cors import CORSMiddleware
 import os
+from pydantic import BaseModel
+
+class Requisicao(BaseModel):
+    pergunta: str
+    historico: list
 
 # Importa sa coisas que você já está usando
 # from app import Chat
@@ -33,23 +38,14 @@ TAGS_SUBSTITUICAO_HTML= {
 }
 
 @controller.post('/chat/enviar_pergunta/')
-async def gerar_resposta(dadosRecebidos):
-    resultado = "teste"
-    # resultado = chat()
-    # pergunta = dadosRecebidos['pergunta']
-    # historico = dadosRecebidos['historico']
-    # chave_openai = dadosRecebidos['chave_openai']
-    
-    # resultado = chat(question=pergunta, history=historico, openai_api_key=chave_openai)
-    
-    # Aqui pode formatar o resultado para ficar de acordo com o que a página html for esperar pra imprimir a resposta
-    
+async def gerar_resposta(dadosRecebidos:Requisicao):
+
+    resultado = chat_service(dadosRecebidos.pergunta,dadosRecebidos.historico)
     return resultado
 
 
 @controller.get('/chat/')
 async def pagina_chat(url_redirec: str = Query(None)):
-    chat_service("quais as formas de violência doméstica?", None)
 
     with open('src/web/chat.html', 'r', encoding='utf-8') as arquivo: conteudo_html = arquivo.read()
     

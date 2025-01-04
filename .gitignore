@@ -7,6 +7,7 @@ __pycache__/
 /artifacts/
 /ambiente-daphane/
 *Zone.Identifier
+langchain.db
 
 # Ignorar a pasta "wandb" e tudo dentro dela, na raiz do repositório
 /wandb/

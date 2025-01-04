@@ -59,8 +59,8 @@ def load_documents(data_dir: str) -> List[Document]:
     ]
     for doc in documents:
         doc.page_content = md_to_plain_text(doc.page_content)
-        
-    print("\n\n ======== documentos ============== \n\n", documents)
+
+    # print("\n\n ======== documentos ============== \n\n", documents)     
     return md_files, documents
 
 

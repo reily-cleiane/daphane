@@ -17,3 +17,5 @@ starlette==0.41.0
 uvicorn==0.32.0
 langchain-chroma
 langchain-ollama
+langchain-community
+unstructured[md]

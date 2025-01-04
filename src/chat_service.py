@@ -1,4 +1,5 @@
 """A Simple chatbot that uses the LangChain and Gradio UI to answer questions about wandb documentation."""
+import json
 import os
 from types import SimpleNamespace
 import re
@@ -41,7 +42,7 @@ class ChatService:
     def __call__(
         self,
         pergunta: str,
-        history: list[tuple[str, str]] | None = None,
+        historico: list[tuple[str, str]] | None = None,
     ):
         """Respode uma pergunta sobre violência doméstica usando a lei maria da penha.
         Args:
@@ -52,7 +53,7 @@ class ChatService:
             list[tuple[str, str]], list[tuple[str, str]]: The chat history before and after the question is answered.
         """
 
-        history = history or []
+        historico = historico or []
         pergunta = pergunta.lower()
 
         retrieved_docs = self.chroma_service.recuperar_fragmentos_relevantes(pergunta)
@@ -63,14 +64,22 @@ class ChatService:
 
         contexto = self.recuperar_conteudo_arquivos(retrieved_docs)
 
-        resposta = self.ollama_service.responder(pergunta, contexto, history)
+        resposta = self.ollama_service.responder(pergunta, contexto, historico)
         # print(f"\n\n resposta ============================== \n\n{resposta}")
 
         self.tabela_requisicao.add_data(pergunta, (doc.metadata["documents"] for doc in retrieved_docs) , resposta)
         wandb.log({"Tabela_Requisicao": self.tabela_requisicao})
-        history.append((pergunta, resposta))
+        historico.append((pergunta, resposta))
         print("\n\n ============ resposta ============ \n\n", resposta)
-        return resposta
+        
+        msg = {
+            "tipo": "dados",
+            "descricao": "Mensagem do LLM",
+            "dados":{
+                "resposta": resposta
+            }
+        }
+        return json.dumps(msg)
 
 
         # # Obtenha a resposta, passando os documentos e o contexto

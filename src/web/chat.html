@@ -360,7 +360,8 @@
                                 } else if (retorno['tipo'] == 'dados') {
                                     var resposta = retorno['dados']['resposta']
                                     divResposta.innerHTML = formatarResposta(resposta);
-                                    historico.push([pergunta, resposta])
+                                    historico.push(pergunta)
+                                    historico.push(resposta)
                                     habilitarCampos = true;
                                 } else {
                                     console.info(retorno);

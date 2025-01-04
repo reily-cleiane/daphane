@@ -38,14 +38,13 @@ class Ollama:
 
 
 
-    def responder(self, pergunta: str, contexto: str, historico):
+    def responder(self, pergunta: str, contexto: str, historico: list[str]):
 
         if len(historico) > TAMANHO_MAXIMO_HISTORICO:
             historico.pop()
             historico.pop()
 
         self.payload["messages"] = self.formatar_historico_mensagens(pergunta, contexto, historico)
-        print("\n\n ================== payload com historico =================== \n\n", self.payload)
 
         try:
 
@@ -61,7 +60,7 @@ class Ollama:
             
             resposta_json, conteudo_resposta = self.tratar_resposta(response)
             
-            return conteudo_resposta
+            return resposta_json, conteudo_resposta
         
         except Exception as e:
             print(f"Erro ao realizar a requisição: {e}")

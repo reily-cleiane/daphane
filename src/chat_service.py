@@ -76,7 +76,7 @@ class ChatService:
             }
         }
 
-        return json.dumps(msg)
+        return msg
     
     def log_requisicao(self, pergunta, retrieved_docs, resposta, resposta_com_metricas):
         fragmentos = ""

@@ -30,7 +30,7 @@ class ChromaDB:
             embedding_function=embedding_fn, persist_directory=vector_store_artifact_dir
         )
 
-        self.logar_fontes_recuperadas(wandb_run)
+        # self.logar_fontes_recuperadas(wandb_run)
 
     
     def logar_fontes_recuperadas(self, wandb_run: wandb.run):

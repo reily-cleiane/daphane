@@ -17,13 +17,15 @@
     <title>Assistente de Busca</title>
     <style>
         :root{
-            --azul-claro: #1A73E8;
-            --azul-medio: #145dbd;
-            --azul-escuro: #163C70;
+            --botao-hover: #54436e;
+            --botao: #6c5b86;
+            --azul-escuro: #c29a81;
+            /* --azul-escuro: #163C70; */
             --branco-fundo-1: #f6f6f6;
             --branco-fundo-2: #f8f9fa;
             --branco-fundo-3: #ccc;
-            --cinza-claro: #e9ecef;
+            --cinza-claro: #f5efe9;
+            /* --cinza-claro: #e9ecef; */
             --cinza-medio: #9e9c9c;
             --cinza-escuro: #616161;
         }
@@ -83,16 +85,17 @@
         }
         .img-assistente{
             margin: 10px;
-            height: 40px;
+            height: 80px;
             border-radius: 50%;
             border-style: solid;
-            border-width: 1px;
-            border-color: gray;
+            border-width: 3px;
+            border-color: var(--azul-escuro);
         }
         .rotulo-assistente{
             margin-left: 10px;
             font-size: 22px;
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-weight: 550;
+            font-family: sans-serif;
             color: var(--azul-escuro)
         }
         .wrapper-container-exibicao-mensagens{
@@ -101,7 +104,7 @@
         .container-exibicao-mensagens{
             flex: 1;
             margin-bottom: 20px;
-            height: calc(100vh - 305px);
+            height: calc(90vh - 305px);
             padding: 10px;
             overflow: auto;
             background-color: var(--cinza-claro);
@@ -167,12 +170,12 @@
             height: 41px;
             border: none;
             border-radius: 4px;
-            background-color: var(--azul-claro);
+            background-color: var(--botao-hover);
             color: white;
             cursor: pointer;
         }
         #botao-enviar:hover{
-            background-color: var(--azul-medio);
+            background-color: var(--botao);
         }
         #botao-enviar:disabled:hover{
             background-color: var(--cinza-medio);

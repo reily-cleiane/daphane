@@ -308,7 +308,7 @@
         
                 const controller = new AbortController();
                 //AFAZER: Ajustar Timeout. levar em conmsideração demora do Ollama em responder
-                const timeoutId = setTimeout(() => controller.abort(), 30000);
+                const timeoutId = setTimeout(() => controller.abort(), 80000);
         
                 try {
                     const response = await fetch("TAG_INSERCAO_URL_HOST/chat/enviar_pergunta/", {

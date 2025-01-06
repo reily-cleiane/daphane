@@ -3,6 +3,7 @@ import json
 import os
 from types import SimpleNamespace
 import re
+import markdown
 
 import wandb
 from src.chromadb_service import ChromaDB
@@ -72,7 +73,7 @@ class ChatService:
             "tipo": "dados",
             "descricao": "Mensagem do LLM",
             "dados":{
-                "resposta": resposta
+                "resposta":markdown.markdown(resposta)
             }
         }
 

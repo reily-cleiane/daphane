@@ -1,5 +1,4 @@
-"""A Simple chatbot that uses the LangChain and Gradio UI to answer questions about wandb documentation."""
-import json
+# import json
 import os
 from types import SimpleNamespace
 import re
@@ -94,17 +93,6 @@ class ChatService:
         
         self.wandb_run.log({"Tabela_Requisicao": self.tabela_log_requisicao})
         
-        # # Obtenha a resposta, passando os documentos e o contexto
-        # response = get_answer(
-        #     chain=self.chain,
-        #     question=question,
-        #     chat_history=history,
-        #     retrieved_docs=retrieved_docs,
-        #     context=combined_context,
-        # )
-        # print(f"\n\nCHAT HISTORY =================================== {history}\n\n")
-        # history.append((question, response))
-        # return history, history
 
     @staticmethod
     def recuperar_conteudo_arquivos(retrieved_docs):

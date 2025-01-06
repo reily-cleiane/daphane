@@ -1,20 +1,20 @@
-import os, random
-from pathlib import Path
-import tiktoken
-from getpass import getpass
-from rich.markdown import Markdown
+# import os, random
+# from pathlib import Path
+# import tiktoken
+# from getpass import getpass
+# from rich.markdown import Markdown
+# from langchain_community.vectorstores import Chroma
+# from chromadb import Client
+# from langchain_ollama.llms import OllamaLLM
+# from langchain_core.prompts import ChatPromptTemplate
+# from langchain_ollama.llms import OllamaLLM
+# from langchain.schema import Document
+
 import wandb
 import requests
 import json
 
-from langchain_ollama.llms import OllamaLLM
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_ollama.llms import OllamaLLM
-from langchain.schema import Document
 from src.config import default_config
-
-# from langchain_community.vectorstores import Chroma
-from chromadb import Client
 
 OLLAMA_SERVER_URL = "http://localhost:11434"
 TAMANHO_MAXIMO_HISTORICO = 8
@@ -45,7 +45,7 @@ class Ollama:
             historico.pop()
 
         self.payload["messages"] = self.formatar_historico_mensagens(pergunta, contexto, historico)
-        print(f"\n\n ============= requisicao ao ollama ================ \n\n Pergunta: {pergunta} \n\n Payload: {self.payload} \n\n")
+        print(f"\n============= Requisição ao ollama ================\nPergunta: {pergunta}\nPayload: {self.payload}\n\n")
 
         try:
 
@@ -103,7 +103,6 @@ class Ollama:
     
     
     def formatar_historico_mensagens(self, pergunta, contexto, historico):
-        print("\n\n historico ========================= \n\n", historico)
         mensagens = [
             {"role": "system", "content": self.system_prompt + contexto +" FIM DO CONTEXTO."},
         ]
@@ -116,43 +115,3 @@ class Ollama:
         
         mensagens.append({"role": "user", "content": pergunta})
         return mensagens
-
-
-
-
-
-
-# def get_answer(
-#     question: str,
-#     chat_history: list[tuple[str, str]],
-#     retrieved_docs: list,
-#     context: str = "",
-    
-# ):
-#     """Get an answer from a ConversationalRetrievalChain
-#     Args:
-#         chain (ConversationalRetrievalChain): A ConversationalRetrievalChain object
-#         question (str): The question to ask
-#         chat_history (list[tuple[str, str]]): A list of tuples of (question, answer)
-#     Returns:
-#         str: The answer to the question
-#     """
-
-#     inputs={"question": "contexto: "+ context+ "Dado o contexto, responda:" +question, "chat_history": chat_history }
-#     print(type(inputs)) 
-    
-#     result = chain(inputs=inputs, return_only_outputs=True)
-
-#     # Print retrieved fragments
-#     source_documents = result.get("source_documents", [])
-#     print("\nDocumentos recuperados\n")
-
-#     for idx, doc in enumerate(source_documents, start=1):
-#         print(f"Fragment {idx}:")
-#         print(f"Content: {doc.page_content}")
-#         print(f"Metadata: {doc.metadata}\n")
-
-#     # Return the answer
-#     response = f"\t{result['answer']}"
-
-#     return response

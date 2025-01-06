@@ -49,7 +49,7 @@ async def gerar_resposta(dadosRecebidos:Requisicao):
 async def pagina_chat(url_redirec: str = Query(None)):
     # AFAZER: considerar se manter esse elemento faz sentido. Só é utilizado para uso de testes com o ngrok, no colab
     if url_redirec:
-        environment.TAGS_SUBSTITUICAO_HTML['TAG_INSERCAO_URL_HOST'] = url_redirec
+        TAGS_SUBSTITUICAO_HTML['TAG_INSERCAO_URL_HOST'] = url_redirec
         
     with open('src/web/chat.html', 'r', encoding='utf-8') as arquivo: conteudo_html = arquivo.read()
     

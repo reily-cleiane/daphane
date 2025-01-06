@@ -81,7 +81,7 @@ class ChatService:
     def log_requisicao(self, pergunta, retrieved_docs, resposta, resposta_com_metricas):
         fragmentos = ""
         for indice, doc in enumerate(retrieved_docs):
-            fragmentos += f"Framento {indice}: {doc.page_content}"
+            fragmentos += f"Framento {indice}: {doc.page_content}\n"
 
         self.tabela_log_requisicao.add_data(pergunta, fragmentos, resposta, 
             resposta_com_metricas["total_duration"], 

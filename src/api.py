@@ -41,7 +41,6 @@ TAGS_SUBSTITUICAO_HTML= {
 async def gerar_resposta(dadosRecebidos:Requisicao):
 
     resultado = chat_service(dadosRecebidos.pergunta,dadosRecebidos.historico)
-    print( f"\n======= Resposta ========\n{resultado}\n")
     return resultado
 
 

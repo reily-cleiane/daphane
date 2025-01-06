@@ -30,11 +30,11 @@ class Ollama:
 
         self.payload = self.gerar_payload()
         
-        prompt_artifact = wandb.Artifact(name="prompt_mensagem_sistema_recuperado", type="prompt")
-        with prompt_artifact.new_file("prompt_mensagem_sistema_recuperado.txt") as f:
-            f.write(self.system_prompt)
+        # prompt_artifact = wandb.Artifact(name="prompt_mensagem_sistema_recuperado", type="prompt")
+        # with prompt_artifact.new_file("prompt_mensagem_sistema_recuperado.txt") as f:
+        #     f.write(self.system_prompt)
 
-        wandb_run.log_artifact(prompt_artifact)
+        # wandb_run.log_artifact(prompt_artifact)
 
 
 
@@ -74,7 +74,7 @@ class Ollama:
         for line in response.iter_lines():
             if line:  # Ignorar linhas vazias
                 data = line.decode('utf-8')
-                print(f"Resposta: {data}")
+                print(f"\n================= Resposta: ========================\n{data}\n\n")
                 try:
                     json_data = json.loads(data)
                     # Verifica e adiciona o conteúdo

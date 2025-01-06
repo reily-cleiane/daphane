@@ -45,6 +45,7 @@ class Ollama:
             historico.pop()
 
         self.payload["messages"] = self.formatar_historico_mensagens(pergunta, contexto, historico)
+        print(f"\n\n ============= requisicao ao ollama ================ \n\n Pergunta: {pergunta} \n\n Payload: {self.payload} \n\n")
 
         try:
 
@@ -102,15 +103,16 @@ class Ollama:
     
     
     def formatar_historico_mensagens(self, pergunta, contexto, historico):
+        print("\n\n historico ========================= \n\n", historico)
         mensagens = [
-            {"role": "system", "content": self.system_prompt + contexto +". FIM DO CONTEXTO."},
+            {"role": "system", "content": self.system_prompt + contexto +" FIM DO CONTEXTO."},
         ]
 
         for indice, mensagem in enumerate(historico):
             if indice % 2 == 0:
                 mensagens.append({"role": "user", "content": mensagem})
             else:
-                mensagem.append({"role": "assistant", "content": mensagem})
+                mensagens.append({"role": "assistant", "content": mensagem})
         
         mensagens.append({"role": "user", "content": pergunta})
         return mensagens

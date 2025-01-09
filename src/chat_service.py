@@ -1,4 +1,5 @@
 # import json
+import json
 import os
 from types import SimpleNamespace
 import re
@@ -40,7 +41,7 @@ class ChatService:
         self.ollama_service = Ollama(wandb_run=self.wandb_run)
 
     
-    def __call__(
+    async def __call__(
         self,
         pergunta: str,
         historico: list[tuple[str, str]] | None = None,
@@ -64,19 +65,27 @@ class ChatService:
         #     print(f"\n\nInício do contexto: =======\n {doc.page_content}\nFim do contexto ======\n\n") 
 
         contexto = self.recuperar_conteudo_arquivos(retrieved_docs)
-        resposta_com_metricas, resposta = self.ollama_service.responder(pergunta, contexto, historico)
-        self.log_requisicao(pergunta, retrieved_docs, resposta, resposta_com_metricas)
-        
-        # historico.append((pergunta, resposta))        
-        msg = {
-            "tipo": "dados",
-            "descricao": "Mensagem do LLM",
-            "dados":{
-                "resposta":markdown.markdown(resposta)
-            }
-        }
+        resposta_completa = ''
 
-        return msg
+        async for fragmento_objeto, fragmento_conteudo in self.ollama_service.responder(pergunta, contexto, historico):
+            resposta_completa += fragmento_conteudo
+
+            if fragmento_objeto['done']:
+                resposta_com_metricas = fragmento_objeto
+                resposta_com_metricas['message']['content'] = resposta_completa
+                self.log_requisicao(pergunta, retrieved_docs, resposta_completa, resposta_com_metricas)
+            
+            yield json.dumps({
+                "tipo": "dados",
+                "descricao": "Mensagem do LLM",
+                "dados":{
+                    # "resposta":markdown.markdown(resposta_completa),
+                    "resposta": fragmento_conteudo,
+                    "done": fragmento_objeto['done']
+                }
+            }) + '\n'
+
+        return
     
     def log_requisicao(self, pergunta, retrieved_docs, resposta, resposta_com_metricas):
         fragmentos = ""

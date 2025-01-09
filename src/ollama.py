@@ -10,6 +10,7 @@
 # from langchain_ollama.llms import OllamaLLM
 # from langchain.schema import Document
 
+import httpx
 import wandb
 import requests
 import json
@@ -38,7 +39,7 @@ class Ollama:
 
 
 
-    def responder(self, pergunta: str, contexto: str, historico: list[str]):
+    async def responder(self, pergunta: str, contexto: str, historico: list[str]):
 
         if len(historico) > TAMANHO_MAXIMO_HISTORICO:
             historico.pop()
@@ -48,43 +49,37 @@ class Ollama:
         print(f"\n============= Requisição ao ollama ================\nPergunta: {pergunta}\nPayload: {self.payload}\n\n")
 
         try:
+            async with httpx.AsyncClient() as client:
+                async with client.stream('POST', f"{OLLAMA_SERVER_URL}/api/chat", json=self.payload, timeout=120) as resposta:
+                    resposta.raise_for_status()
+                    if resposta.status_code != 200:
+                        print("Erro na requisição:", resposta.text)
+                        yield ""
 
-            response = requests.post(
-                f"{OLLAMA_SERVER_URL}/api/chat", 
-                json=self.payload, 
-                timeout=100
-            )
-
-            if response.status_code != 200:
-                print("Erro na requisição:", response.text)
-                return ""
-            
-            resposta_json, conteudo_resposta = self.tratar_resposta(response)
-            
-            return resposta_json, conteudo_resposta
+                    async for fragmento in resposta.aiter_bytes():
+                        if fragmento:
+                            try:
+                                resposta_json, conteudo_resposta = self.tratar_resposta(fragmento)
+                                yield resposta_json, conteudo_resposta
+                            except:
+                                print('ERRO: falha na serialização do fragmento\n' + fragmento.decode())
         
         except Exception as e:
             print(f"Erro ao realizar a requisição: {e}")
-            return ""
+            return #""
         
     
     @staticmethod
     def tratar_resposta(response):
-        conteudo_resposta = ""
-        for line in response.iter_lines():
-            if line:  # Ignorar linhas vazias
-                data = line.decode('utf-8')
-                print(f"\n================= Resposta: ========================\n{data}\n\n")
-                try:
-                    json_data = json.loads(data)
-                    # Verifica e adiciona o conteúdo
-                    if "message" in json_data and "content" in json_data["message"]:
-                        conteudo_resposta += json_data["message"]["content"]
-                except Exception as e:
-                    print(f"Erro ao processar linha: {data}, Erro: {e}")
-                    continue
-        # resposta da requisição com todos os atributos (in)
-        return json_data, conteudo_resposta.strip()
+        data = response.decode('utf-8')
+        print(f"\n================= Resposta: ========================\n{data}\n\n")
+        try:
+            json_data = json.loads(data)
+            # resposta da requisição com todos os atributos (in)
+            return json_data, json_data["message"]["content"]
+        except Exception as e:
+            print(f"Erro ao processar linha: {data}, Erro: {e}")
+            return None
 
     
     def gerar_payload(self):
@@ -97,7 +92,7 @@ class Ollama:
                 "top_k": default_config.options["top_k"],
                 "top_p": default_config.options["top_p"]
             },
-            "stream": False, # Se for usar tool precisa ser false
+            "stream": True, # Se for usar tool precisa ser false
         }
         return payload
     

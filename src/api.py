@@ -1,6 +1,6 @@
 # Bibliotecas pra rodar a api
 from fastapi import FastAPI, Query
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from starlette.middleware.cors import CORSMiddleware
 import os
 from pydantic import BaseModel
@@ -40,8 +40,7 @@ TAGS_SUBSTITUICAO_HTML= {
 @controller.post('/chat/enviar_pergunta/')
 async def gerar_resposta(dadosRecebidos:Requisicao):
 
-    resultado = chat_service(dadosRecebidos.pergunta,dadosRecebidos.historico)
-    return resultado
+    return StreamingResponse(chat_service(dadosRecebidos.pergunta,dadosRecebidos.historico), media_type='text/plain')
 
 
 @controller.get('/chat/')

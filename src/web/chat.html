@@ -269,7 +269,7 @@
         var historico = []
 
         function formatarResposta(texto_resposta){
-            return `<p>${texto_resposta}</p>`;
+            return `<p>${texto_resposta.replace('\n','</p><p>')}</p>`;
         }
 
         function rolagemAutomatica(){
@@ -336,7 +336,7 @@
                     const reader = response.body.getReader();
                     const decoder = new TextDecoder("utf-8");
                     let recebeuFlagFimMensagem = false;
-                    let textoAcumulado = "<p>";
+                    let respostaCompleta = "<p>";
         
                     while (true) {
                         rolagemAutomatica();
@@ -365,10 +365,13 @@
                                     continue;
                                 } else if (retorno['tipo'] == 'dados') {
                                     var resposta = retorno['dados']['resposta']
-                                    divResposta.innerHTML = formatarResposta(resposta);
-                                    historico.push(pergunta)
-                                    historico.push(resposta)
-                                    habilitarCampos = true;
+                                    respostaCompleta += resposta
+                                    divResposta.innerHTML = formatarResposta(respostaCompleta);
+                                    if (retorno['dados']['done']) {
+                                        historico.push(pergunta)
+                                        historico.push(resposta)
+                                        habilitarCampos = true;
+                                    }
                                 } else {
                                     console.info(retorno);
                                     continue;

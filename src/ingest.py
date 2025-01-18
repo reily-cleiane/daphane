@@ -118,6 +118,77 @@ def load_documents(data_dir: str) -> List[Document]:
     # print("\n\n ======== documentos ============== \n\n", documents)     
     return md_files, documents
 
+from docling.document_converter import DocumentConverter
+from docling_core.types.doc.document import DoclingDocument
+from docling.chunking import HierarchicalChunker
+
+def load_documents_com_docling(data_dir: str) -> Tuple[List[str], List[DoclingDocument]]:
+    """Carrega documentos markdown em um diretório específico
+
+    Args:
+        data_dir (str): O diretório em que estão os documentos
+
+    Returns:
+        List[str]: uma lista de urls/caminhos para os arquivos .md.
+        List[DoclingDocument]: Uma lista de objetos docling_core.types.doc.document.DoclingDocument
+        gerados a partir de arquivos .md.
+    """
+
+    md_files = list(map(str, pathlib.Path(data_dir).glob("*.md")))
+
+    conversor = DocumentConverter()
+
+    documents = [conversor.convert(url_arquivo_md).document for url_arquivo_md in md_files]
+    
+    return md_files, documents
+
+def chunk_documents_com_docling(
+    urls_md_files: List[str],
+    documents: List[DoclingDocument], chunk_size: int = 500, chunk_overlap=0
+) -> List[Document]:
+    """Divide os arquivos em fragmentos de forma hierárquica e converte
+       em langchain.docstore.document.Document
+
+    Args:
+        List[str]: uma lista de urls/caminhos para os arquivos .md.
+        documents List[DoclingDocument]: Uma lista de objetos docling_core.types.doc.document.DoclingDocument
+        gerados a partir de arquivos .md.
+
+    Returns:
+        List[Document]: Uma lista de documento langchain.docstore.document.Document, sendo cada um
+        um fragmento gerado por particionamento hierárquico de um arquivo .md.
+    """
+    
+    # Tem que ver se tem alguma configuração de hierarquia aqui,
+    # pra ficar de um jeito que você goste.
+    particionador_hierarquico = HierarchicalChunker()
+    
+    documentos_langchain = []
+    
+    for idx in range(len(urls_md_files)):
+        path = urls_md_files[idx]
+        doc = documents[idx]
+        chunks = particionador_hierarquico.chunk(dl_doc=doc)
+        
+        for chunk in chunks:
+            # Usando direto o método HierarchicalChunker.serialize
+            # >> Ele mantém o cabeçalho da seção em fragmento criado. Cada fragmento
+            #    é correspondente, pelo que entendi, a uma linha da seção. Acho que
+            #    deve ter como configurar            
+            texto_formatado = particionador_hierarquico.serialize(chunk=chunk)
+            
+            # Aqui eu acho que consegui fazer o negócio que você faz de formatar os documentos
+            # em plain text no método original
+            plain_text = md_to_plain_text(texto_formatado)
+            
+            doc_langchain = Document(
+                page_content=plain_text,
+                metadata={'source': path}
+            )
+            
+            documentos_langchain.append(doc_langchain)
+            
+    return documentos_langchain
 
 def chunk_documents(
     documents: List[Document], chunk_size: int = 500, chunk_overlap=0

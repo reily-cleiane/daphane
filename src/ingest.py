@@ -105,9 +105,7 @@ def md_to_plain_text(md_text):
 def chunk_documents_com_docling(md_files, chunk_size: int = 500, chunk_overlap=0):
 
     converter = DocumentConverter()
-
     EMBED_MODEL_ID = "openai-gpt"
-
     tokenizer = AutoTokenizer.from_pretrained(EMBED_MODEL_ID)
 
     chunker = HybridChunker(
@@ -224,7 +222,6 @@ def log_dataset(documents: List[Document], run: "wandb.run"):
 
     run.log_artifact(document_artifact)
 
-
 def log_index(vector_store_dir: str, run: "wandb.run"):
     """Log a vector store to wandb
 
@@ -260,26 +257,13 @@ def log_prompt_mensagem_sistema(run: "wandb.run"):
     artefato.add_file("prompt_mensagem_sistema.txt")
     run.log_artifact(artefato)
 
-
-# def log_prompt(prompt: dict, run: "wandb.run"):
-#     """Log a prompt to wandb
-
-#     Args:
-#         prompt (str): The prompt to log
-#         run (wandb.run): The wandb run to log the artifact to.
-#     """
-#     prompt_artifact = wandb.Artifact(name="chat_prompt", type="prompt")
-#     with prompt_artifact.new_file("prompt.json") as f:
-#         f.write(json.dumps(prompt))
-#     run.log_artifact(prompt_artifact)
-
 def ingest_data(
     docs_dir: str,
     chunk_size: int,
     chunk_overlap: int,
     vector_store_path: str,
     chunker: str,
-    gerar_mds: bool
+    converter_pdfs: bool
 ) -> Tuple[List[Document], Chroma]:
     """Ingest a directory of markdown files into a vector store
 
@@ -290,7 +274,7 @@ def ingest_data(
         vector_store_path (str):
 
     """
-    if gerar_mds:
+    if converter_pdfs:
         converter_pdf_para_markdown(docs_dir)
 
     if chunker == "docling":
@@ -334,20 +318,14 @@ def get_parser():
         default="./vector_store",
         help="The directory to save or load the Chroma db to/from",
     )
-    # parser.add_argument(
-    #     "--prompt_file",
-    #     type=pathlib.Path,
-    #     default="./chat_prompt.json",
-    #     help="The path to the chat prompt to use",
-    # )
     parser.add_argument(
-        "--wandb_project",
-        default="daphane",
-        type=str,
-        help="The wandb project to use for storing artifacts",
+        "--prompt_file",
+        type=pathlib.Path,
+        default="./prompt_mensagem_sistema.txt",
+        help="The path to the chat prompt to use",
     )
     parser.add_argument(
-        "--gerar_mds",
+        "--converter_pdfs",
         action="store_true",
         help="Gerar mds a partir de pdfs da pasta de documentos base",
     )
@@ -365,7 +343,7 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     args.modelo_embed = default_config.modelo_embed
-    run = wandb.init(project=args.wandb_project, job_type="ingest", config=args)
+    run = wandb.init(project=default_config.project, job_type="ingest", config=args)
     
     documents, vector_store, md_files = ingest_data(
         docs_dir=args.docs_dir,
@@ -373,12 +351,11 @@ def main():
         chunk_overlap=args.chunk_overlap,
         vector_store_path=args.vector_store,
         chunker=args.chunker,
-        gerar_mds=args.gerar_mds
+        converter_pdfs=args.converter_pdfs
     )
 
     log_dataset(documents, run)
     log_index(args.vector_store, run)
-    # log_prompt(json.load(args.prompt_file.open("r")), run) # esse aqui é pra permanecer removido
     log_prompt_mensagem_sistema(run)
     log_arquivos_base(md_files, run)
     run.finish()

@@ -144,7 +144,7 @@ def load_documents_com_docling(data_dir: str) -> Tuple[List[str], List[DoclingDo
 
 def chunk_documents_com_docling(
     urls_md_files: List[str],
-    documents: List[DoclingDocument], chunk_size: int = 500, chunk_overlap=0
+    documents: List[DoclingDocument]
 ) -> List[Document]:
     """Divide os arquivos em fragmentos de forma hierárquica e converte
        em langchain.docstore.document.Document

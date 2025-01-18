@@ -1,6 +1,7 @@
 """Ingest a directory of documentation files into a vector store and store the relevant artifacts in Weights & Biases"""
 import argparse
 import logging
+import time
 import os
 import pathlib
 from typing import List, Tuple
@@ -17,9 +18,63 @@ import shutil
 from config import default_config
 import re
 
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import (EasyOcrOptions, PdfPipelineOptions)
+from docling.document_converter import DocumentConverter, PdfFormatOption
+
 langchain.llm_cache = SQLiteCache(database_path="langchain.db")
 
 logger = logging.getLogger(__name__)
+
+def converter_pdf_para_markdown(caminho_documentos_base):
+    docs_dir = pathlib.Path(caminho_documentos_base)
+
+    if not docs_dir.is_dir():
+        logger.error(f"Diretório {docs_dir} não encontrado.")
+        return
+    
+    # Docling Parse with EasyOCR
+    # ----------------------
+    pipeline_options = PdfPipelineOptions()
+    pipeline_options.do_ocr = True
+    pipeline_options.do_table_structure = True
+    pipeline_options.table_structure_options.do_cell_matching = True
+    ocr_options = EasyOcrOptions(force_full_page_ocr=True, lang=["pt"])
+    pipeline_options.ocr_options = ocr_options
+    # pipeline_options.accelerator_options = AcceleratorOptions(
+    #     num_threads=4, device=Device.AUTO
+    # )
+
+    doc_converter = DocumentConverter(
+        format_options={
+            InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+        }
+    )
+
+    ## Export results
+    output_dir = docs_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    for pdf_file in docs_dir.glob("*.pdf"):
+        try:
+            logger.info(f"Convertendo {pdf_file.name}...")
+            start_time = time.time()
+            
+            # Converter o PDF
+            conv_result = doc_converter.convert(pdf_file)
+            end_time = time.time() - start_time
+            
+            # Salvar resultado em Markdown
+            doc_filename = conv_result.input.file.stem
+            output_file = output_dir / f"{doc_filename}.md"
+            with output_file.open("w", encoding="utf-8") as fp:
+                fp.write(conv_result.document.export_to_markdown())
+
+            logger.info(f"{pdf_file.name} convertido em {output_file} em {end_time:.2f} segundos.")
+        
+        except Exception as e:
+            logger.error(f"Erro ao converter {pdf_file.name}: {e}")
+
 
 def md_to_plain_text(md_text):
     """
@@ -193,6 +248,8 @@ def ingest_data(
         vector_store_path (str):
 
     """
+
+    # converter_pdf_para_markdown(docs_dir)
     # load the documents
     md_files, documents = load_documents(docs_dir)
     # split the documents into chunks
@@ -249,8 +306,10 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     args.job_type = "ingest"
+    args.chunking = "langchain"
+    # args.chunking = "docling"
     args.modelo_embed = default_config.modelo_embed
-    run = wandb.init(project=args.wandb_project, config=args)
+    run = wandb.init(project=args.wandb_project, job_type="ingest", config=args)
     
     documents, vector_store, md_files = ingest_data(
         docs_dir=args.docs_dir,
@@ -258,9 +317,10 @@ def main():
         chunk_overlap=args.chunk_overlap,
         vector_store_path=args.vector_store,
     )
+
     log_dataset(documents, run)
     log_index(args.vector_store, run)
-    # log_prompt(json.load(args.prompt_file.open("r")), run)
+    # log_prompt(json.load(args.prompt_file.open("r")), run) # esse aqui é pra permanecer removido
     log_prompt_mensagem_sistema(run)
     log_arquivos_base(md_files, run)
     run.finish()

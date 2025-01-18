@@ -364,7 +364,6 @@ def get_parser():
 def main():
     parser = get_parser()
     args = parser.parse_args()
-    args.job_type = "ingest"
     args.modelo_embed = default_config.modelo_embed
     run = wandb.init(project=args.wandb_project, job_type="ingest", config=args)
     

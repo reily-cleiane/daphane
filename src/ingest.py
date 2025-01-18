@@ -21,6 +21,11 @@ import re
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import (EasyOcrOptions, PdfPipelineOptions)
 from docling.document_converter import DocumentConverter, PdfFormatOption
+from docling.chunking import HybridChunker
+from docling.chunking import HierarchicalChunker
+
+from transformers import AutoTokenizer
+
 
 langchain.llm_cache = SQLiteCache(database_path="langchain.db")
 
@@ -97,8 +102,45 @@ def md_to_plain_text(md_text):
 
     return plain_text.strip()
 
+def chunk_documents_com_docling(md_files, chunk_size: int = 500, chunk_overlap=0):
 
-def load_documents(data_dir: str) -> List[Document]:
+    converter = DocumentConverter()
+
+    EMBED_MODEL_ID = "openai-gpt"
+
+    tokenizer = AutoTokenizer.from_pretrained(EMBED_MODEL_ID)
+
+    chunker = HybridChunker(
+        tokenizer=tokenizer,  # instance or model name, defaults to "sentence-transformers/all-MiniLM-L6-v2"
+        max_tokens=chunk_size,  # optional, by default derived from `tokenizer`
+        merge_peers=True,  # optional, defaults to True
+    )
+    documentos_langchain = []
+
+    for md_file in md_files:
+        
+        # Converter o arquivo para um documento docling
+        doc = converter.convert(source=md_file).document
+        
+        # Gerar os chunks do documento
+        chunk_iter = chunker.chunk(dl_doc=doc)
+        
+        # Exibir ou processar os chunks gerados
+        chunks = list(chunk_iter)
+
+        for chunk in chunks:
+            texto_em_md = chunker.serialize(chunk=chunk)
+            plain_text = md_to_plain_text(texto_em_md)
+
+            doc_langchain = Document(
+                page_content=plain_text,
+                metadata={'source': md_file}
+            )
+            documentos_langchain.append(doc_langchain)
+    return documentos_langchain
+
+
+def load_documents_com_langchain(data_dir: str) -> List[Document]:
     """Load documents from a directory of markdown files
 
     Args:
@@ -114,12 +156,11 @@ def load_documents(data_dir: str) -> List[Document]:
     ]
     for doc in documents:
         doc.page_content = md_to_plain_text(doc.page_content)
-
-    # print("\n\n ======== documentos ============== \n\n", documents)     
+  
     return md_files, documents
 
 
-def chunk_documents(
+def chunk_documents_com_langchain(
     documents: List[Document], chunk_size: int = 500, chunk_overlap=0
 ) -> List[Document]:
     """Split documents into chunks
@@ -232,12 +273,13 @@ def log_prompt_mensagem_sistema(run: "wandb.run"):
 #         f.write(json.dumps(prompt))
 #     run.log_artifact(prompt_artifact)
 
-
 def ingest_data(
     docs_dir: str,
     chunk_size: int,
     chunk_overlap: int,
     vector_store_path: str,
+    chunker: str,
+    gerar_mds: bool
 ) -> Tuple[List[Document], Chroma]:
     """Ingest a directory of markdown files into a vector store
 
@@ -248,12 +290,18 @@ def ingest_data(
         vector_store_path (str):
 
     """
+    if gerar_mds:
+        converter_pdf_para_markdown(docs_dir)
 
-    # converter_pdf_para_markdown(docs_dir)
-    # load the documents
-    md_files, documents = load_documents(docs_dir)
-    # split the documents into chunks
-    split_documents = chunk_documents(documents, chunk_size, chunk_overlap)
+    if chunker == "docling":
+        md_files = list(map(str, pathlib.Path(docs_dir).glob("*.md")))
+        # split the documents into chunks
+        split_documents = chunk_documents_com_docling(md_files, chunk_size, chunk_overlap)
+    else:
+        # load the documents
+        md_files, documents = load_documents_com_langchain(docs_dir)
+        split_documents = chunk_documents_com_langchain(documents, chunk_size, chunk_overlap)
+
     # create document embeddings and store them in a vector store
     vector_store = create_vector_store(split_documents, vector_store_path)
     return split_documents, vector_store, md_files
@@ -271,13 +319,13 @@ def get_parser():
     parser.add_argument(
         "--chunk_size",
         type=int,
-        default=450,
+        default=500,
         help="The number of tokens to include in each document chunk",
     )
     parser.add_argument(
         "--chunk_overlap",
         type=int,
-        default=50,
+        default=0,
         help="The number of tokens to overlap between document chunks",
     )
     parser.add_argument(
@@ -298,6 +346,17 @@ def get_parser():
         type=str,
         help="The wandb project to use for storing artifacts",
     )
+    parser.add_argument(
+        "--gerar_mds",
+        action="store_true",
+        help="Gerar mds a partir de pdfs da pasta de documentos base",
+    )
+    parser.add_argument(
+        "--chunker",
+        default="docling",
+        type=str,
+        help="Chunker usado para gerar os chunks para o banco vetorial, deve ser docling ou langchain",
+    )
 
     return parser
 
@@ -306,8 +365,6 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     args.job_type = "ingest"
-    args.chunking = "langchain"
-    # args.chunking = "docling"
     args.modelo_embed = default_config.modelo_embed
     run = wandb.init(project=args.wandb_project, job_type="ingest", config=args)
     
@@ -316,6 +373,8 @@ def main():
         chunk_size=args.chunk_size,
         chunk_overlap=args.chunk_overlap,
         vector_store_path=args.vector_store,
+        chunker=args.chunker,
+        gerar_mds=args.gerar_mds
     )
 
     log_dataset(documents, run)

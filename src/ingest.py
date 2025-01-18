@@ -322,9 +322,11 @@ def ingest_data(
 
     # converter_pdf_para_markdown(docs_dir)
     # load the documents
-    md_files, documents = load_documents(docs_dir)
+    # md_files, documents = load_documents(docs_dir)
+    md_files, documents = load_documents_com_docling(docs_dir)
     # split the documents into chunks
-    split_documents = chunk_documents(documents, chunk_size, chunk_overlap)
+    # split_documents = chunk_documents(documents, chunk_size, chunk_overlap)
+    split_documents = chunk_documents_com_docling(md_files, documents)
     # create document embeddings and store them in a vector store
     vector_store = create_vector_store(split_documents, vector_store_path)
     return split_documents, vector_store, md_files

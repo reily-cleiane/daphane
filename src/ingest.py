@@ -137,9 +137,10 @@ def load_documents_com_docling(data_dir: str) -> Tuple[List[str], List[DoclingDo
     md_files = list(map(str, pathlib.Path(data_dir).glob("*.md")))
 
     conversor = DocumentConverter()
-
-    documents = [conversor.convert(url_arquivo_md).document for url_arquivo_md in md_files]
-    
+    documents = []
+    for url_arquivo_md in md_files:
+        result = conversor.convert(url_arquivo_md)
+        documents.append(result.document)
     return md_files, documents
 
 def chunk_documents_com_docling(

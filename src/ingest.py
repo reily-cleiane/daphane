@@ -108,6 +108,12 @@ def chunk_documents_com_docling(md_files, chunk_size: int = 500, chunk_overlap=0
     EMBED_MODEL_ID = "openai-gpt"
     tokenizer = AutoTokenizer.from_pretrained(EMBED_MODEL_ID)
 
+    # chunker = HierarchicalChunker(
+    #     tokenizer=tokenizer,  # instance or model name, defaults to "sentence-transformers/all-MiniLM-L6-v2"
+    #     max_tokens=chunk_size,  # optional, by default derived from `tokenizer`
+    #     merge_peers=True,  # optional, defaults to True
+    # )
+
     chunker = HybridChunker(
         tokenizer=tokenizer,  # instance or model name, defaults to "sentence-transformers/all-MiniLM-L6-v2"
         max_tokens=chunk_size,  # optional, by default derived from `tokenizer`

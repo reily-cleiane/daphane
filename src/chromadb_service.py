@@ -52,7 +52,7 @@ class ChromaDB:
         """
         Realiza consulta no banco de vetores para identificar fragmentos com similaridade com a pergunta
         """
-        retriever = self.vector_store.as_retriever(search_kwargs=dict(k=2))
+        retriever = self.vector_store.as_retriever(search_kwargs=dict(k=default_config.numero_fragmentos_recuperados))
         retrieved_docs = retriever.get_relevant_documents(pergunta)
         return retrieved_docs
 

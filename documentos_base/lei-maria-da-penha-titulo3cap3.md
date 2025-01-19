@@ -7,13 +7,13 @@ Parágrafo único. Aplica-se o disposto no caput deste artigo ao descumprimento 
 
 Art. 10-A. É direito da mulher em situação de violência doméstica e familiar o atendimento policial e pericial especializado, ininterrupto e prestado por servidores - preferencialmente do sexo feminino - previamente capacitados. 
 1. § 1º A inquirição de mulher em situação de violência doméstica e familiar ou de testemunha de violência doméstica, quando se tratar de crime contra a mulher, obedecerá às seguintes diretrizes: 
-    1. I - salvaguarda da integridade física, psíquica e emocional da depoente, considerada a sua condição peculiar de pessoa em situação de violência doméstica e familiar; 
-    2. II - garantia de que, em nenhuma hipótese, a mulher em situação de violência doméstica e familiar, familiares e testemunhas terão contato direto com investigados ou suspeitos e pessoas a eles relacionadas; 
-    3. III - não revitimização da depoente, evitando sucessivas inquirições sobre o mesmo fato nos âmbitos criminal, cível e administrativo, bem como questionamentos sobre a vida privada. 
+1. I - salvaguarda da integridade física, psíquica e emocional da depoente, considerada a sua condição peculiar de pessoa em situação de violência doméstica e familiar; 
+2. II - garantia de que, em nenhuma hipótese, a mulher em situação de violência doméstica e familiar, familiares e testemunhas terão contato direto com investigados ou suspeitos e pessoas a eles relacionadas; 
+3. III - não revitimização da depoente, evitando sucessivas inquirições sobre o mesmo fato nos âmbitos criminal, cível e administrativo, bem como questionamentos sobre a vida privada. 
 2. § 2º Na inquirição de mulher em situação de violência doméstica e familiar ou de testemunha de delitos de que trata esta Lei, adotar-se-á, preferencialmente, o seguinte procedimento: 
-    1. I - a inquirição será feita em recinto especialmente projetado para esse fim, o qual conterá os equipamentos próprios e adequados à idade da mulher em situação de violência doméstica e familiar ou testemunha e ao tipo e à gravidade da violência sofrida; 
-    2. II - quando for o caso, a inquirição será intermediada por profissional especializado em violência doméstica e familiar designado pela autoridade judiciária ou policial; 
-    3. III - o depoimento será registrado em meio eletrônico ou magnético, devendo a degravação e a mídia integrar o inquérito.
+1. I - a inquirição será feita em recinto especialmente projetado para esse fim, o qual conterá os equipamentos próprios e adequados à idade da mulher em situação de violência doméstica e familiar ou testemunha e ao tipo e à gravidade da violência sofrida; 
+2. II - quando for o caso, a inquirição será intermediada por profissional especializado em violência doméstica e familiar designado pela autoridade judiciária ou policial; 
+3. III - o depoimento será registrado em meio eletrônico ou magnético, devendo a degravação e a mídia integrar o inquérito.
 
 Art. 11.  No atendimento à mulher em situação de violência doméstica e familiar, a autoridade policial deverá, entre outras providências: 
 1. I - garantir proteção policial, quando necessário, comunicando de imediato ao Ministério Público e ao Poder Judiciário; 
@@ -32,13 +32,12 @@ Art. 12.  Em todos os casos de violência doméstica e familiar contra a mulher,
 7. VI-A - verificar se o agressor possui registro de porte ou posse de arma de fogo e, na hipótese de existência, juntar aos autos essa informação, bem como notificar a ocorrência à instituição responsável pela concessão do registro ou da emissão do porte, nos termos da Lei nº 10.826, de 22 de dezembro de 2003 (Estatuto do Desarmamento); 
 8. VII - remeter, no prazo legal, os autos do inquérito policial ao juiz e ao Ministério Público.
 
-<br>
 
 1. § 1º O pedido da ofendida será tomado a termo pela autoridade policial e deverá conter: 
-    1. I - qualificação da ofendida e do agressor; 
-    2. II - nome e idade dos dependentes; 
-    3. III - descrição sucinta do fato e das medidas protetivas solicitadas pela ofendida; 
-    4. IV - informação sobre a condição de a ofendida ser pessoa com deficiência e se da violência sofrida resultou deficiência ou agravamento de deficiência preexistente. 
+1. I - qualificação da ofendida e do agressor; 
+2. II - nome e idade dos dependentes; 
+3. III - descrição sucinta do fato e das medidas protetivas solicitadas pela ofendida; 
+4. IV - informação sobre a condição de a ofendida ser pessoa com deficiência e se da violência sofrida resultou deficiência ou agravamento de deficiência preexistente. 
 2. § 2º A autoridade policial deverá anexar ao documento referido no § 1º o boletim de ocorrência e cópia de todos os documentos disponíveis em posse da ofendida. 
 3. § 3º Serão admitidos como meios de prova os laudos ou prontuários médicos fornecidos por hospitais e postos de saúde. 
 
@@ -52,7 +51,6 @@ Art. 12-C. Verificada a existência de risco atual ou iminente à vida ou à int
 2. II - pelo delegado de polícia, quando o Município não for sede de comarca; ou 
 3. III - pelo policial, quando o Município não for sede de comarca e não houver delegado disponível no momento da denúncia.
 
-<br>
 
 1. § 1º Nas hipóteses dos incisos II e III do caput deste artigo, o juiz será comunicado no prazo máximo de 24 (vinte e quatro) horas e decidirá, em igual prazo, sobre a manutenção ou a revogação da medida aplicada, devendo dar ciência ao Ministério Público concomitantemente.
 2. § 2º Nos casos de risco à integridade física da ofendida ou à efetividade da medida protetiva de urgência, não será concedida liberdade provisória ao preso. 

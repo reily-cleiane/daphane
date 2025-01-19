@@ -9,8 +9,6 @@ class Requisicao(BaseModel):
     pergunta: str
     historico: list
 
-# Importa sa coisas que você já está usando
-# from app import Chat
 from src.config import default_config
 from src.chat_service import ChatService
 
@@ -27,8 +25,7 @@ controller.add_middleware(
     allow_headers=['*'],  # Allow all headers
 )
 
-# Instancia o Chat lá do seu código
-# chat = Chat(config=default_config)
+# Instancia o service
 chat_service = ChatService()
 
 TAGS_SUBSTITUICAO_HTML= {
@@ -73,9 +70,9 @@ async def favicon(): return FileResponse('src/web/img/favicon/apple-touch-icon.p
 async def favicon(): return FileResponse('src/web/img/favicon/site.webmanifest')
 
 @controller.get('/web/img/Assistente.png')
-async def legisberto(): return FileResponse('src/web/img/Assistente.png')
+async def identidade(): return FileResponse('src/web/img/Assistente.png')
 
 @controller.get('/web/img/logo_al.png')
-async def legisberto(): return FileResponse('src/web/img/logo_al.png')
+async def identidade(): return FileResponse('src/web/img/logo_al.png')
 
 print('API inicializada')

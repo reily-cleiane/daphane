@@ -46,7 +46,7 @@ class Ollama:
             historico.pop()
 
         self.payload["messages"] = self.formatar_historico_mensagens(pergunta, contexto, historico)
-        print(f"\n============= Requisição ao ollama ================\nPergunta: {pergunta}\nPayload: {self.payload}\n\n")
+        print(f"\n============= Requisição ao ollama ================\nPergunta: {pergunta}\nContexto: {contexto}\n\n")
 
         try:
             async with httpx.AsyncClient() as client:
@@ -61,8 +61,8 @@ class Ollama:
                             try:
                                 resposta_json, conteudo_resposta = self.tratar_resposta(fragmento)
                                 yield resposta_json, conteudo_resposta
-                            except:
-                                print('ERRO: falha na serialização do fragmento\n' + fragmento.decode())
+                            except Exception as e:
+                                print('ERRO: falha na serialização do fragmento\n' + fragmento.decode()+ "\n"+e)
         
         except Exception as e:
             print(f"Erro ao realizar a requisição: {e}")
@@ -72,7 +72,7 @@ class Ollama:
     @staticmethod
     def tratar_resposta(response):
         data = response.decode('utf-8')
-        print(f"\n================= Resposta: ========================\n{data}\n\n")
+        # print(f"\n================= Resposta: ========================\n{data}\n\n")
         try:
             json_data = json.loads(data)
             # resposta da requisição com todos os atributos (in)
@@ -102,6 +102,7 @@ class Ollama:
         # "Você pode dar outras informações genéricas humanizadas, mas use obrigatoriamente esse fragmento da lei maria da penha para responder a pergunta da usuária:: " + 
         # contexto + ". Se esse fragmento da lei apresentado anteriormente não contiver a resposta para a pergunta da usuária, informe a usuária que você não tem dados suficientes para responder a pergunta."}]
         mensagens = [{"role": "system", "content": self.system_prompt }]
+        # print(f"\n\n ===== historico =======\n\n {historico} \n\n")
 
         for indice, mensagem in enumerate(historico):
             if indice % 2 == 0:
@@ -112,8 +113,8 @@ class Ollama:
         # mensagens.append({"role": "user", "content": pergunta})
         mensagens.append({"role": "user", "content": 
             "Use esse texto referencial para embasar sua resposta: "+ contexto +
-            "Não mencione que houve um texto referencial na sua resposta. "+
-            "Utilize linguagem simples e evite o uso de palavras difíceis ou rebuscadas, jargões ou termos técnicos. "+
-            "Demonstre empatia e sensibilidade. "+
-            "Responda essa pergunta: " + pergunta})
+            # "Não mencione que houve um texto referencial na sua resposta. "+
+            # "Utilize linguagem simples e evite o uso de palavras difíceis ou rebuscadas, jargões ou termos técnicos. "+
+            # "Demonstre empatia e sensibilidade. "+
+            "\n Agora responda essa pergunta: " + pergunta})
         return mensagens

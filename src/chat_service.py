@@ -22,15 +22,19 @@ class ChatService:
             config (SimpleNamespace): The configuration.
         """
         self.config = default_config
+        config_wandb = {**vars(default_config)}
+
+        keys_to_remove = ['project', 'entity', 'job_type', 'max_fallback_retries'] 
+        for key in keys_to_remove:
+            config_wandb.pop(key, None) 
+
         self.wandb_run = wandb.init(
             project=self.config.project,
             entity=self.config.entity,
             job_type=self.config.job_type,
-            config=self.config,
+            config=config_wandb
         )
         self.chain = None
-        self.tabela_log_requisicao = wandb.Table(columns=["pergunta", "fragmentos_recuperados", "resposta_modelo",
-        "total_duration", "load_duration","prompt_eval_duration", "prompt_eval_count", "eval_count", "eval_duration"])
 
         if os.environ["OPENAI_API_KEY"]:
             openai_key = os.environ["OPENAI_API_KEY"]
@@ -64,11 +68,13 @@ class ChatService:
         #     print(doc.metadata["source"])
         #     print(f"\n\nInício do contexto: =======\n {doc.page_content}\nFim do contexto ======\n\n") 
 
+        # contexto = "\n".join([doc.page_content for doc in retrieved_docs])
+        
         contexto = self.recuperar_conteudo_arquivos(retrieved_docs)
         resposta_completa = ''
 
         async for fragmento_objeto, fragmento_conteudo in self.ollama_service.responder(pergunta, contexto, historico):
-            resposta_completa += fragmento_conteudo
+            resposta_completa += fragmento_conteudo 
 
             if fragmento_objeto['done']:
                 resposta_com_metricas = fragmento_objeto
@@ -88,11 +94,14 @@ class ChatService:
         return
     
     def log_requisicao(self, pergunta, retrieved_docs, resposta, resposta_com_metricas):
+        tabela_log_requisicao = wandb.Table(columns=["pergunta", "fragmentos_recuperados", "resposta_modelo",
+        "total_duration", "load_duration","prompt_eval_duration", "prompt_eval_count", "eval_count", "eval_duration"])
+
         fragmentos = ""
         for indice, doc in enumerate(retrieved_docs):
-            fragmentos += f"Framento {indice}: {doc.page_content}\n"
+            fragmentos += f"Framento {indice} - {doc.metadata['source']} ============\n:  {doc.page_content}\n\n"
 
-        self.tabela_log_requisicao.add_data(pergunta, fragmentos, resposta, 
+        tabela_log_requisicao.add_data(pergunta, fragmentos, resposta, 
             resposta_com_metricas["total_duration"], 
             resposta_com_metricas["load_duration"],
             resposta_com_metricas["prompt_eval_duration"], 
@@ -100,18 +109,27 @@ class ChatService:
             resposta_com_metricas["eval_count"], 
             resposta_com_metricas["eval_duration"])
         
-        self.wandb_run.log({"Tabela_Requisicao": self.tabela_log_requisicao})
-        
+        self.wandb_run.log({"Tabela_Requisicao": tabela_log_requisicao})
 
     @staticmethod
     def recuperar_conteudo_arquivos(retrieved_docs):
-        unique_sources = set(doc.metadata["source"] for doc in retrieved_docs)
         conteudo = []
-        for source_file in unique_sources:
-            with open("./src/"+source_file, "r") as f:
-                conteudo.append(ChatService.md_to_plain_text(f.read()))
-        conteudo_combinano = "\n".join(conteudo)
-        return conteudo_combinano
+        arquivos_processados = set() 
+
+        for doc in retrieved_docs:
+            source_file = doc.metadata["source"]
+
+            if source_file.startswith("lei-maria-da-penha") and source_file not in arquivos_processados:
+                # Adicionar o conteúdo do arquivo apenas se ainda não foi processado
+                with open(f"./src/{source_file}", "r") as f:
+                    conteudo.append(ChatService.md_to_plain_text(f.read()))
+                arquivos_processados.add(source_file)
+            elif not source_file.startswith("lei-maria-da-penha"):
+                # Adicionar o conteúdo da página
+                conteudo.append(doc.page_content)
+
+        conteudo_combinado = "\n".join(conteudo)
+        return conteudo_combinado
     
     @staticmethod
     def md_to_plain_text(md_text):

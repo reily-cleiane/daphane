@@ -1,6 +1,6 @@
 wandb>=0.15.3
 openai>=1.58.1,<2.0.0
-pandas==1.5.*
+pandas
 unstructured>=0.6.10
 langchain>=0.0.188
 tenacity>=8.2.2
